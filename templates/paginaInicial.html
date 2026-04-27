@@ -1,0 +1,73 @@
+
+    {% extends '_base.html' %}
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h2>My Music List</h2>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#">🏠 Início</a></li>
+                    <li><a href="#">🔍 Buscar</a></li>
+                    <li><a href="#">📚 Minha Lista</a></li>
+                    <li><a href="#">❤️ Favoritos</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            
+            <!-- Seção: Melhores Avaliadas -->
+            <section>
+                <h1>As Melhores Avaliadas</h1>
+                <div class="music-grid">
+                    {% for track in top_rated %}
+                        <div class="track-card">
+                            <img src="https://placehold.co/300x300/181818/ffffff?text={{ track.title|url_encode }}" alt="Capa de {{ track.title }}">
+                            <span class="track-title">{{ track.title }}</span>
+                            <span class="track-artist">{{ track.artist_name }}</span>
+                            <div class="rating-badge">★ {{ track.average_rating }}</div>
+                        </div>
+                    {% else %}
+                        <p>Nenhuma música encontrada.</p>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Seção: Mais Populares -->
+            <section style="margin-top: 48px;">
+                <h1>Mais Ouvidas</h1>
+                <div class="music-grid">
+                    {% for track in popular %}
+                        <div class="track-card">
+                            <img src="https://placehold.co/300x300/181818/ffffff?text={{ track.title|url_encode }}" alt="Capa de {{ track.title }}">
+                            <span class="track-title">{{ track.title }}</span>
+                            <span class="track-artist">{{ track.artist_name }}</span>
+                            <div class="rating-badge" style="color: var(--text-muted); border-color: var(--text-muted);">
+                                🎧 {{ track.listen_count }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Seção: Artistas em Destaque -->
+            <section style="margin-top: 48px;">
+                <h1>Artistas em Destaque</h1>
+                <div class="music-grid">
+                    {% for artist in artists %}
+                        <div class="track-card" style="text-align: center;">
+                            <!-- Imagens de artistas costumam ser redondas no estilo Spotify -->
+                            <img src="https://placehold.co/300x300/1db954/ffffff?text={{ artist.name|url_encode }}" 
+                                 alt="{{ artist.name }}" 
+                                 style="border-radius: 50%;">
+                            <span class="track-title">{{ artist.name }}</span>
+                            <span class="track-artist">Artista</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+        </main>
+    </div>
+{% endblock %}

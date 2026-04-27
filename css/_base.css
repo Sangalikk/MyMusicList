@@ -1,0 +1,126 @@
+:root {
+    --bg-black: #000000;
+    --bg-dark-grey: #121212;
+    --bg-light-grey: #181818;
+    --bg-hover: #282828;
+    --text-main: #ffffff;
+    --text-muted: #b3b3b3;
+    --spotify-green: #1db954;
+    --rating-gold: #ffb400;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-black);
+    color: var(--text-main);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+}
+
+/* Layout Principal */
+.app-container {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    height: 100-vh;
+}
+
+/* Sidebar Estilo Spotify */
+.sidebar {
+    background-color: var(--bg-black);
+    padding: 24px;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+}
+
+.sidebar h2 {
+    color: var(--spotify-green);
+    margin-bottom: 24px;
+    font-size: 1.5rem;
+}
+
+.nav-links {
+    list-style: none;
+}
+
+.nav-links li {
+    margin-bottom: 16px;
+}
+
+.nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: var(--text-main);
+}
+
+/* Conteúdo Principal */
+.main-content {
+    background: linear-gradient(to bottom, #222222, var(--bg-dark-grey));
+    padding: 32px;
+    overflow-y: auto;
+}
+
+/* Grade de Músicas */
+.music-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 24px;
+    margin-top: 20px;
+}
+
+/* Card de Música */
+.track-card {
+    background-color: var(--bg-light-grey);
+    padding: 16px;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+
+.track-card:hover {
+    background-color: var(--bg-hover);
+}
+
+.track-card img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+
+.track-title {
+    font-weight: bold;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.track-artist {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* Sistema de Notas */
+.rating-badge {
+    display: inline-block;
+    background-color: var(--bg-black);
+    color: var(--rating-gold);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin-top: 8px;
+    border: 1px solid var(--rating-gold);
+}
