@@ -1,7 +1,7 @@
 <?php
 // paginaInicial.php
-require_once('../carregarPDO.php');
-require_once('../carregarTwig.php');
+require_once('carregarPDO.php');
+require_once('carregarTwig.php');
 
 try {
     // 1. Buscar as músicas melhor avaliadas (Top Rated)

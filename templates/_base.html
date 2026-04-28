@@ -4,10 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Music List - Início</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="{{ base_url }}css/_base.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
-    {% block content %}
-    {% endblock %}
+    <div class="app-container">
+        {% block sidebar %}
+            <aside class="sidebar">
+                <h2>My Music List</h2>
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="{{ base_url }}paginaInicial.php">Início</a></li>
+                        <li><a href="{{ base_url }}paginaBuscar.php">Buscar</a></li>
+                        <li><a href="{{ base_url }}paginaMinhaLista.php">Minha Lista</a></li>
+                        <li><a href="{{ base_url }}paginaFavoritos.php">Favoritos</a></li>
+                    </ul>
+                </nav>
+            </aside>
+        {% endblock %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
 </body>
 </html>

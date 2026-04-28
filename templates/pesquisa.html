@@ -1,0 +1,22 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<div class="main-content">
+    <h1>Resultados para: "{{ query }}"</h1>
+
+    <div class="music-grid">
+        {% for track in tracks %}
+            <div class="track-card">
+                <img src="{{ track.image_url }}" alt="Capa de {{ track.title }}">
+                <span class="track-title">{{ track.title }}</span>
+                <span class="track-artist">{{ track.artist_name }}</span>
+                <div class="track-artist" style="font-size: 0.8rem; margin-top: 5px;">
+                    Álbum: {{ track.album_name }}
+                </div>
+            </div>
+        {% else %}
+            <p>Nenhuma música encontrada para sua busca.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,22 +1,8 @@
+{% extends '_base.html' %}
 
-    {% extends '_base.html' %}
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <h2>My Music List</h2>
-            <nav>
-                <ul class="nav-links">
-                    <li><a href="#">🏠 Início</a></li>
-                    <li><a href="#">🔍 Buscar</a></li>
-                    <li><a href="#">📚 Minha Lista</a></li>
-                    <li><a href="#">❤️ Favoritos</a></li>
-                </ul>
-            </nav>
-        </aside>
-
+{% block content %}
         <!-- Conteúdo Principal -->
         <main class="main-content">
-            
             <!-- Seção: Melhores Avaliadas -->
             <section>
                 <h1>As Melhores Avaliadas</h1>
@@ -33,7 +19,6 @@
                     {% endfor %}
                 </div>
             </section>
-
             <!-- Seção: Mais Populares -->
             <section style="margin-top: 48px;">
                 <h1>Mais Ouvidas</h1>
@@ -67,7 +52,5 @@
                     {% endfor %}
                 </div>
             </section>
-
         </main>
-    </div>
 {% endblock %}

@@ -17,8 +17,9 @@ CREATE TABLE artists (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     bio TEXT,
-    country VARCHAR(100)
-    external_id VARCHAR(255) UNIQUE -- ID do artista na API externa (ex: Spotify ID, MusicBrainz ID)
+    country VARCHAR(100),
+    image_url VARCHAR(500), -- URL da foto do artista
+    external_id VARCHAR(255) UNIQUE 
 ) ENGINE=InnoDB;
 
 -- Criação da tabela de Músicas (Tracks)
@@ -29,6 +30,7 @@ CREATE TABLE tracks (
     artist_id INT,
     album_name VARCHAR(255),
     release_date DATE,
+    image_url VARCHAR(500), -- URL da capa do álbum
     duration_seconds INTEGER,
     external_id VARCHAR(255) UNIQUE, -- ID da música na API externa
     
