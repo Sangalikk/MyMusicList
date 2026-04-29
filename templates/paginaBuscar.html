@@ -2,12 +2,16 @@
 
 {% block content %}
 <div class="search-container">
-    <h1>Buscar Músicas</h1>
-    
-    <form action="paginaBuscar.php" method="GET" style="margin-bottom: 30px;">
-        <input type="text" name="q" value="{{ query }}" placeholder="Busque por música ou artista..." 
-               class="rating-input" style="max-width: 500px; padding: 15px; font-size: 1.1rem;">
-    </form>
+    <div class="search-bar-section">
+        <h1>Buscar Músicas</h1>
+        
+        <form action="paginaBuscar.php" method="GET" class="search-form-centered">
+            <div class="search-input-wrapper">
+                <span class="search-icon-placeholder">🔍</span>
+                <input type="text" name="q" value="{{ query }}" placeholder="O que você quer ouvir?" class="spotify-search-input">
+            </div>
+        </form>
+    </div>
 
     {% if message %}<div style="color: var(--spotify-green); margin-bottom: 20px;">{{ message }}</div>{% endif %}
     {% if error %}<div style="color: #ff4444; margin-bottom: 20px;">{{ error }}</div>{% endif %}
@@ -19,11 +23,10 @@
             <span class="track-title">{{ track.title }}</span>
             <span class="track-artist">{{ track.artist_name }}</span>
             
-            <!-- Spotify Player Embed -->
-            <iframe src="https://open.spotify.com/embed/track/{{ track.spotify_id }}?utm_source=generator&theme=0" 
-                    width="100%" height="80" frameBorder="0" allowfullscreen="" 
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                    style="margin-top: 10px; border-radius: 8px;"></iframe>
+            <!-- Deezer Player Widget -->
+            <iframe title="deezer-widget" src="https://widget.deezer.com/widget/dark/track/{{ track.spotify_id }}" 
+                    width="100%" height="80" frameborder="0" allowtransparency="true" 
+                    allow="encrypted-media; clipboard-write" style="margin-top: 10px; border-radius: 8px;"></iframe>
 
             <!-- Formulário de Ações (Salvar/Avaliar) -->
             <form action="paginaBuscar.php" method="POST" class="search-actions">
@@ -35,8 +38,7 @@
                 <input type="hidden" name="album_name" value="{{ track.album_name }}">
                 <input type="hidden" name="image_url" value="{{ track.image_url }}">
                 <input type="hidden" name="duration" value="{{ track.duration }}">
-                <!-- Enviar uma imagem de artista genérica ou buscar via API depois -->
-                <input type="hidden" name="artist_image" value="">
+                <input type="hidden" name="artist_image" value="{{ track.artist_image }}">
 
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <select name="rating" class="rating-input" title="Sua nota">

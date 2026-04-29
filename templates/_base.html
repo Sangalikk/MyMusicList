@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="app-container">
+    <div class="app-container {% block container_class %}{% endblock %}">
         {% block sidebar %}
             <aside class="sidebar">
                 <h2>My Music List</h2>
@@ -22,6 +22,18 @@
                         <li><a href="{{ base_url }}paginaFavoritos.php">Favoritos</a></li>
                     </ul>
                 </nav>
+
+                <div class="auth-section">
+                    {% if session.username %}
+                        <div class="user-profile">
+                            <span class="user-name">Olá, {{ session.username }}</span>
+                            <a href="{{ base_url }}logout.php" class="btn-logout">Sair da conta</a>
+                        </div>
+                    {% else %}
+                        <a href="{{ base_url }}paginaRegistrar.php" class="btn-register-sidebar">Inscrever-se</a>
+                        <a href="{{ base_url }}paginaLogin.php" class="btn-login-sidebar">Entrar</a>
+                    {% endif %}
+                </div>
             </aside>
         {% endblock %}
 

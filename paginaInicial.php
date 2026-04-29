@@ -1,5 +1,6 @@
 <?php
 // paginaInicial.php
+session_start();
 require_once('carregarPDO.php');
 require_once('carregarTwig.php');
 

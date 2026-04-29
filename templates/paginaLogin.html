@@ -1,0 +1,85 @@
+{% extends "_base.html" %}
+
+{% block container_class %}full-page{% endblock %}
+{% block sidebar %}{% endblock %} {# Removemos a sidebar na tela de login para focar no form #}
+
+{% block content %}
+<style>
+    .login-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        width: 100%;
+    }
+    .login-card {
+        background-color: #121212;
+        padding: 40px;
+        border-radius: 8px;
+        width: 100%;
+        max-width: 450px;
+        text-align: center;
+    }
+    .login-card h1 {
+        font-size: 2rem;
+        margin-bottom: 30px;
+        font-weight: 800;
+    }
+    .login-form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .login-form label {
+        text-align: left;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+    .login-input {
+        background: #121212;
+        border: 1px solid #727272;
+        border-radius: 4px;
+        padding: 14px;
+        color: white;
+        font-size: 1rem;
+    }
+    .login-input:focus {
+        border-color: #1ed760;
+        outline: none;
+    }
+    .btn-login {
+        background-color: #1ed760;
+        color: black;
+        border: none;
+        border-radius: 500px;
+        padding: 14px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: transform 0.2s;
+    }
+    .btn-login:hover {
+        transform: scale(1.04);
+        background-color: #1fdf64;
+    }
+    .footer-link { color: #b3b3b3; font-size: 0.9rem; margin-top: 25px; display: block; }
+    .footer-link a { color: white; font-weight: 700; }
+</style>
+
+<div class="login-wrapper">
+    <div class="login-card">
+        <h1>Entrar no MyMusicList</h1>
+        {% if error %}<p style="color: #ff4444; margin-bottom: 20px;">{{ error }}</p>{% endif %}
+        <form method="POST" class="login-form">
+            <label for="email">E-mail</label>
+            <input type="email" name="email" id="email" class="login-input" placeholder="E-mail" required>
+            <label for="password">Senha</label>
+            <input type="password" name="password" id="password" class="login-input" placeholder="Senha" required>
+            <button type="submit" class="btn-login">ENTRAR</button>
+        </form>
+
+        <span class="footer-link">Não tem uma conta? <a href="paginaRegistrar.php">Inscreva-se</a>.</span>
+    </div>
+</div>
+{% endblock %}

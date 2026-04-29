@@ -34,6 +34,11 @@ body {
     min-height: 100vh;
 }
 
+/* Classe para telas cheias (Login/Registro) sem sidebar */
+.app-container.full-page {
+    grid-template-columns: 1fr;
+}
+
 /* Sidebar Estilo Spotify */
 .sidebar {
     background-color: var(--bg-black);
@@ -41,6 +46,8 @@ body {
     height: 100%;
     position: sticky;
     top: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .sidebar h2 {
@@ -161,3 +168,79 @@ body {
     transition: transform 0.2s;
 }
 .btn-save:hover { transform: scale(1.05); }
+
+/* Seção de Autenticação na Sidebar */
+.auth-section {
+    margin-top: auto; /* Empurra para o final da sidebar */
+    padding-top: 24px;
+    border-top: 1px solid var(--bg-hover);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.btn-login-sidebar {
+    background-color: var(--text-main);
+    color: var(--bg-black);
+    text-align: center;
+    padding: 12px;
+    border-radius: 500px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.2s;
+}
+
+.btn-login-sidebar:hover { transform: scale(1.04); background-color: #f6f6f6; }
+
+.btn-register-sidebar {
+    color: var(--text-muted);
+    text-align: center;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+
+.btn-register-sidebar:hover { color: var(--text-main); }
+
+.user-name { color: var(--spotify-green); font-weight: 800; display: block; margin-bottom: 4px; }
+.btn-logout { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; }
+.btn-logout:hover { color: var(--text-main); text-decoration: underline; }
+
+/* Estilização da Busca estilo Spotify */
+.search-bar-section {
+    text-align: center;
+    margin-bottom: 40px;
+    width: 100%;
+}
+
+.search-bar-section h1 {
+    margin-bottom: 24px;
+}
+
+.search-form-centered {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.search-input-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+}
+
+.spotify-search-input {
+    width: 100%;
+    background-color: rgba(61, 61, 61, 0.765);
+    color: rgb(255, 255, 255);
+    border: none;
+    padding: 14px 20px 14px 48px;
+    border-radius: 500px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    font-family: inherit;
+}
+
+.spotify-search-input:focus { outline: 2px solid var(--spotify-green); }
+.search-icon-placeholder { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #000; font-size: 1.1rem; }

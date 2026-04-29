@@ -19,7 +19,9 @@ CREATE TABLE artists (
     bio TEXT,
     country VARCHAR(100),
     image_url VARCHAR(500), -- URL da foto do artista
-    external_id VARCHAR(255) UNIQUE 
+    external_id VARCHAR(255),
+    provider VARCHAR(20) DEFAULT 'deezer',
+    UNIQUE KEY idx_artist_external (external_id, provider)
 ) ENGINE=InnoDB;
 
 -- Criação da tabela de Músicas (Tracks)
@@ -32,14 +34,16 @@ CREATE TABLE tracks (
     release_date DATE,
     image_url VARCHAR(500), -- URL da capa do álbum
     duration_seconds INTEGER,
-    external_id VARCHAR(255) UNIQUE, -- ID da música na API externa
+    external_id VARCHAR(255), -- ID da música na API externa
+    provider VARCHAR(20) DEFAULT 'deezer',
     
     -- Estatísticas agregadas (facilita a leitura em massa)
     average_rating DECIMAL(3, 2) DEFAULT 0.00, -- Média das notas
     favorite_count INTEGER DEFAULT 0,         -- Total de favoritos
     listen_count INTEGER DEFAULT 0,           -- Total de pessoas que ouviram
 
-    FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE CASCADE
+    FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE CASCADE,
+    UNIQUE KEY idx_track_external (external_id, provider)
 ) ENGINE=InnoDB;
 
 -- Tabela de relacionamento: A "Lista" do Usuário

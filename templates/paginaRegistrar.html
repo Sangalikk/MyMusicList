@@ -1,0 +1,95 @@
+{% extends "_base.html" %}
+
+{% block container_class %}full-page{% endblock %}
+{% block sidebar %}{% endblock %}
+
+{% block content %}
+<style>
+    .login-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 90vh;
+        width: 100%;
+        padding: 20px;
+    }
+    .login-card {
+        background-color: #121212;
+        padding: 40px;
+        border-radius: 8px;
+        width: 100%;
+        max-width: 450px;
+        text-align: center;
+    }
+    .login-card h1 {
+        font-size: 2rem;
+        margin-bottom: 30px;
+        font-weight: 800;
+        letter-spacing: -1px;
+    }
+    .login-form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .login-form label {
+        text-align: left;
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+    .login-input {
+        background: #121212;
+        border: 1px solid #727272;
+        border-radius: 4px;
+        padding: 12px;
+        color: white;
+        font-size: 1rem;
+    }
+    .login-input:focus {
+        border-color: #1ed760;
+        outline: none;
+    }
+    .btn-login {
+        background-color: #1ed760;
+        color: black;
+        border: none;
+        border-radius: 500px;
+        padding: 14px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: transform 0.2s;
+    }
+    .btn-login:hover { transform: scale(1.04); background-color: #1fdf64; }
+    .footer-link { color: #b3b3b3; font-size: 0.9rem; margin-top: 25px; display: block; }
+    .footer-link a { color: white; font-weight: 700; }
+</style>
+
+<div class="login-wrapper">
+    <div class="login-card">
+        <h1>Inscreva-se grátis para começar a avaliar</h1>
+        
+        {% if error %}<p style="color: #ff4444; margin-bottom: 20px;">{{ error }}</p>{% endif %}
+        {% if success %}<p style="color: #1ed760; margin-bottom: 20px;">{{ success }}</p>{% endif %}
+
+        <form method="POST" class="login-form">
+            <label for="username">Como devemos chamar você?</label>
+            <input type="text" name="username" id="username" class="login-input" value="{{ old_username }}" placeholder="Nome de usuário" required>
+            
+            <label for="email">Qual é o seu e-mail?</label>
+            <input type="email" name="email" id="email" class="login-input" value="{{ old_email }}" placeholder="E-mail" required>
+            
+            <label for="password">Crie uma senha</label>
+            <input type="password" name="password" id="password" class="login-input" placeholder="Senha" required>
+            
+            <label for="password_confirm">Confirme sua senha</label>
+            <input type="password" name="password_confirm" id="password_confirm" class="login-input" placeholder="Repita a senha" required>
+            
+            <button type="submit" class="btn-login">INSCREVER-SE</button>
+        </form>
+
+        <span class="footer-link">Já tem uma conta? <a href="paginaLogin.php">Faça login</a>.</span>
+    </div>
+</div>
+{% endblock %}

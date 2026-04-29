@@ -1,27 +1,8 @@
 <?php
 // paginaBuscar.php
+session_start();
 require_once('carregarPDO.php');
 require_once('carregarTwig.php');
-
-// --- CONFIGURAÇÕES SPOTIFY ---
-$clientId = 'bda7aef332c14b439c1836e5b1f2932b';
-$clientSecret = 'd89f9e23499b451b973b883365706e1b';
-
-function getSpotifyAccessToken($id, $secret) {
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, 'https://accounts.spotify.com/api/token');
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, 'grant_type=client_credentials');
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Essencial para rodar no XAMPP local
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Authorization: Basic ' . base64_encode($id . ':' . $secret),
-        'Content-Type: application/x-www-form-urlencoded'
-    ]);
-    $result = curl_exec($ch);
-    $data = json_decode($result, true);
-    return $data['access_token'] ?? null;
-}
 
 // --- LÓGICA DE SALVAMENTO (POST) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save') {
@@ -29,15 +10,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $pdo->beginTransaction();
 
         // 1. Garantir que o artista existe
-        $stmtArt = $pdo->prepare("INSERT IGNORE INTO artists (name, external_id, image_url) VALUES (?, ?, ?)");
+        $stmtArt = $pdo->prepare("INSERT IGNORE INTO artists (name, external_id, image_url, provider) VALUES (?, ?, ?, 'deezer')");
         $stmtArt->execute([$_POST['artist_name'], $_POST['artist_id'], $_POST['artist_image']]);
         
-        $stmtGetArt = $pdo->prepare("SELECT id FROM artists WHERE external_id = ?");
+        $stmtGetArt = $pdo->prepare("SELECT id FROM artists WHERE external_id = ? AND provider = 'deezer'");
         $stmtGetArt->execute([$_POST['artist_id']]);
         $artistId = $stmtGetArt->fetchColumn();
 
         // 2. Garantir que a música existe
-        $stmtTrack = $pdo->prepare("INSERT IGNORE INTO tracks (title, artist_id, album_name, image_url, external_id, duration_seconds) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmtTrack = $pdo->prepare("INSERT IGNORE INTO tracks (title, artist_id, album_name, image_url, external_id, duration_seconds, provider) VALUES (?, ?, ?, ?, ?, ?, 'deezer')");
         $stmtTrack->execute([
             $_POST['title'], 
             $artistId, 
@@ -47,12 +28,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $_POST['duration']
         ]);
 
-        $stmtGetTrack = $pdo->prepare("SELECT id FROM tracks WHERE external_id = ?");
+        $stmtGetTrack = $pdo->prepare("SELECT id FROM tracks WHERE external_id = ? AND provider = 'deezer'");
         $stmtGetTrack->execute([$_POST['spotify_id']]);
         $trackId = $stmtGetTrack->fetchColumn();
 
-        // 3. Salvar na lista do usuário (User ID 1 como exemplo, implementar sessão depois)
-        $userId = 1; 
+        if (!$trackId) {
+            throw new Exception("Não foi possível processar a música no banco de dados.");
+        }
+
+        // 3. Salvar na lista do usuário logado
+        if (!isset($_SESSION['user_id'])) {
+            throw new Exception("Você precisa estar logado para salvar músicas.");
+        }
+        
+        $userId = $_SESSION['user_id']; 
+
+        // Verifica se o usuário da sessão ainda existe no banco de dados.
+        // Útil para evitar erros de chave estrangeira se o banco for resetado.
+        $stmtCheckUser = $pdo->prepare("SELECT id FROM users WHERE id = ?");
+        $stmtCheckUser->execute([$userId]);
+        if (!$stmtCheckUser->fetch()) {
+            session_destroy(); // Encerra a sessão inválida
+            throw new Exception("Usuário não encontrado ou sessão expirada. Por favor, faça login novamente.");
+        }
+
         $rating = $_POST['rating'] ?: null;
         $isFavorite = isset($_POST['favorite']) ? 1 : 0;
 
@@ -78,54 +77,47 @@ $query = $_GET['q'] ?? '';
 $tracks = [];
 
 if ($query) {
-    $token = getSpotifyAccessToken($clientId, $clientSecret);
-    
-    // Verificação estrita: se não houver token, gera erro antes de tentar a busca
-    if (!$token) {
-        $error = "Falha na autenticação: Não foi possível obter o Token do Spotify. Verifique se suas chaves e o cURL estão corretos.";
-    } else {
-        try {
-            $ch = curl_init();
-            $params = [
-                'q' => $query,
-                'type' => 'track',
-                'limit' => 15
-            ];
-            
-            curl_setopt($ch, CURLOPT_URL, 'https://api.spotify.com/v1/search?' . http_build_query($params));
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Essencial para rodar no XAMPP local
-            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $token]);
-            $result = curl_exec($ch);
-            
-            if (curl_errno($ch)) {
-                throw new Exception(curl_error($ch));
-            }
-
-            $data = json_decode($result, true);
-            
-            if (isset($data['error'])) {
-                throw new Exception($data['error']['message']);
-            }
-
-            if (isset($data['tracks']['items'])) {
-                foreach ($data['tracks']['items'] as $item) {
-                    $tracks[] = [
-                        'spotify_id' => $item['id'],
-                        'title' => $item['name'],
-                        'artist_name' => $item['artists'][0]['name'],
-                        'artist_id' => $item['artists'][0]['id'],
-                        'album_name' => $item['album']['name'],
-                        'image_url' => $item['album']['images'][0]['url'] ?? '',
-                        'duration' => floor($item['duration_ms'] / 1000),
-                        'preview_url' => $item['preview_url']
-                    ];
-                }
-            }
-            curl_close($ch);
-        } catch (Exception $e) {
-            $error = "Erro na API do Spotify: " . $e->getMessage();
+    try {
+        $ch = curl_init();
+        $params = [
+            'q' => $query,
+            'limit' => 21
+        ];
+        
+        // A API da Deezer não exige Token para buscas públicas
+        curl_setopt($ch, CURLOPT_URL, 'https://api.deezer.com/search?' . http_build_query($params));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        $result = curl_exec($ch);
+        
+        if (curl_errno($ch)) {
+            throw new Exception(curl_error($ch));
         }
+
+        $data = json_decode($result, true);
+        
+        if (isset($data['error'])) {
+            throw new Exception($data['error']['message']);
+        }
+
+        if (isset($data['data'])) {
+            foreach ($data['data'] as $item) {
+                $tracks[] = [
+                    'spotify_id' => $item['id'], // Mantendo o nome da chave para compatibilidade com o POST
+                    'title' => $item['title'],
+                    'artist_name' => $item['artist']['name'],
+                    'artist_id' => $item['artist']['id'],
+                    'artist_image' => $item['artist']['picture_medium'],
+                    'album_name' => $item['album']['title'],
+                    'image_url' => $item['album']['cover_medium'] ?? '',
+                    'duration' => $item['duration'], // Deezer já retorna em segundos
+                    'preview_url' => $item['preview']
+                ];
+            }
+        }
+        curl_close($ch);
+    } catch (Exception $e) {
+        $error = "Erro na API da Deezer: " . $e->getMessage();
     }
 }
 
