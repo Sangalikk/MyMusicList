@@ -3,12 +3,10 @@
 {% block content %}
 <div class="search-container">
     <div class="search-bar-section">
-        <h1>Buscar Músicas</h1>
-        
         <form action="paginaBuscar.php" method="GET" class="search-form-centered">
             <div class="search-input-wrapper">
-                <span class="search-icon-placeholder">🔍</span>
-                <input type="text" name="q" value="{{ query }}" placeholder="O que você quer ouvir?" class="spotify-search-input">
+                <i class="fa-solid fa-magnifying-glass search-icon-placeholder"></i>
+                <input type="text" name="q" value="{{ query }}" placeholder="O que você quer ouvir?" class="spotify-search-input" autocomplete="off">
             </div>
         </form>
     </div>
@@ -23,10 +21,12 @@
             <span class="track-title">{{ track.title }}</span>
             <span class="track-artist">{{ track.artist_name }}</span>
             
-            <!-- Deezer Player Widget -->
-            <iframe title="deezer-widget" src="https://widget.deezer.com/widget/dark/track/{{ track.spotify_id }}" 
-                    width="100%" height="80" frameborder="0" allowtransparency="true" 
-                    allow="encrypted-media; clipboard-write" style="margin-top: 10px; border-radius: 8px;"></iframe>
+            <!-- Placeholder para o Player -->
+            <div class="preview-wrapper" style="min-height: 90px; display: flex; align-items: center; justify-content: center;">
+                <button type="button" class="btn-listen-trigger btn-save" 
+                        style="background: #333; color: white; width: 100%;" 
+                        data-track-id="{{ track.spotify_id }}">▶ Ouvir Prévia</button>
+            </div>
 
             <!-- Formulário de Ações (Salvar/Avaliar) -->
             <form action="paginaBuscar.php" method="POST" class="search-actions">

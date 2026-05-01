@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
     <div class="app-container {% block container_class %}{% endblock %}">
@@ -40,5 +41,56 @@
         {% block content %}
         {% endblock %}
     </div>
+
+    <div id="notification-container" class="notification-container"></div>
+
+    <!-- Modal de Edição de Música -->
+    <div id="track-edit-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn">&times;</button>
+            
+            <!-- Tela Principal: Edição -->
+            <div id="modal-main-section">
+                <h2>Editar Música</h2>
+                <form id="edit-track-form">
+                    <input type="hidden" name="action" value="update">
+                    <input type="hidden" name="track_id" id="modal-track-id">
+
+                    <div class="form-group">
+                        <label for="modal-rating">Sua Nota:</label>
+                        <select name="rating" id="modal-rating" class="rating-input">
+                            <option value="">Sem Nota</option>
+                            {% for i in 10..1 %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label for="modal-favorite" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" name="favorite" id="modal-favorite" value="1" style="width: auto; margin: 0;"> Marcar como Favorita ❤️
+                        </label>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="submit" class="btn-save">Salvar Alterações</button>
+                        <button type="button" class="btn-delete" id="modal-delete-btn">Remover da Lista</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tela de Confirmação de Remoção -->
+            <div id="modal-confirm-section" style="display: none; text-align: center;">
+                <h2>Tem certeza?</h2>
+                <p style="margin-bottom: 20px; color: var(--text-muted);">Deseja mesmo remover esta música da sua lista?</p>
+                <div class="modal-actions">
+                    <button type="button" id="btn-confirm-delete-final" class="btn-delete">Sim, Remover</button>
+                    <button type="button" id="btn-cancel-delete" class="btn-save" style="background: #333; color: white;">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ base_url }}templates/js/notifications.js"></script>
 </body>
 </html>

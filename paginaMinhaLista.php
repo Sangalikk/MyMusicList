@@ -18,9 +18,14 @@ try {
         SELECT 
             t.title, 
             t.image_url, 
-            t.external_id, 
+            t.id AS internal_track_id,
+            t.external_id AS spotify_id, 
             t.album_name,
+            t.listen_count,
+            t.duration_seconds AS duration,
             a.name AS artist_name, 
+            a.external_id AS artist_id,
+            a.image_url AS artist_image,
             ut.rating, 
             ut.is_favorite
         FROM user_tracks ut

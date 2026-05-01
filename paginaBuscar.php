@@ -5,7 +5,7 @@ require_once('carregarPDO.php');
 require_once('carregarTwig.php');
 
 // --- LÓGICA DE SALVAMENTO (POST) ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     try {
         $pdo->beginTransaction();
 
@@ -36,39 +36,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             throw new Exception("Não foi possível processar a música no banco de dados.");
         }
 
-        // 3. Salvar na lista do usuário logado
-        if (!isset($_SESSION['user_id'])) {
-            throw new Exception("Você precisa estar logado para salvar músicas.");
+        if ($_POST['action'] === 'save') {
+            // 3. Salvar na lista do usuário logado
+            if (!isset($_SESSION['user_id'])) {
+                throw new Exception("Você precisa estar logado para salvar músicas.");
+            }
+            
+            $userId = $_SESSION['user_id']; 
+
+            // Verifica se o usuário da sessão ainda existe
+            $stmtCheckUser = $pdo->prepare("SELECT id FROM users WHERE id = ?");
+            $stmtCheckUser->execute([$userId]);
+            if (!$stmtCheckUser->fetch()) {
+                session_destroy();
+                throw new Exception("Usuário não encontrado. Por favor, faça login novamente.");
+            }
+
+            // Validação obrigatória da nota para salvar na lista
+            if (empty($_POST['rating'])) {
+                throw new Exception("Por favor, deixe uma nota");
+            }
+
+            $rating = $_POST['rating'];
+            $isFavorite = isset($_POST['favorite']) ? 1 : 0;
+
+            $stmtUserTrack = $pdo->prepare("REPLACE INTO user_tracks (user_id, track_id, rating, is_favorite) VALUES (?, ?, ?, ?)");
+            $stmtUserTrack->execute([$userId, $trackId, $rating, $isFavorite]);
+
+            // Atualizar estatísticas globais de avaliação
+            $pdo->prepare("UPDATE tracks SET 
+                average_rating = (SELECT AVG(rating) FROM user_tracks WHERE track_id = ?),
+                favorite_count = (SELECT COUNT(*) FROM user_tracks WHERE track_id = ? AND is_favorite = 1)
+                WHERE id = ?")->execute([$trackId, $trackId, $trackId]);
+
+            $response = ['status' => 'success', 'message' => 'Adicionado à sua lista!'];
+
+        } elseif ($_POST['action'] === 'listen') {
+            // 4. Incrementar o contador de ouvintes (Ação de ouvir prévia)
+            $stmtListen = $pdo->prepare("UPDATE tracks SET listen_count = listen_count + 1 WHERE id = ?");
+            $stmtListen->execute([$trackId]);
+            
+            $response = ['status' => 'success', 'message' => 'Ouvinte registrado!'];
         }
-        
-        $userId = $_SESSION['user_id']; 
-
-        // Verifica se o usuário da sessão ainda existe no banco de dados.
-        // Útil para evitar erros de chave estrangeira se o banco for resetado.
-        $stmtCheckUser = $pdo->prepare("SELECT id FROM users WHERE id = ?");
-        $stmtCheckUser->execute([$userId]);
-        if (!$stmtCheckUser->fetch()) {
-            session_destroy(); // Encerra a sessão inválida
-            throw new Exception("Usuário não encontrado ou sessão expirada. Por favor, faça login novamente.");
-        }
-
-        $rating = $_POST['rating'] ?: null;
-        $isFavorite = isset($_POST['favorite']) ? 1 : 0;
-
-        $stmtUserTrack = $pdo->prepare("REPLACE INTO user_tracks (user_id, track_id, rating, is_favorite) VALUES (?, ?, ?, ?)");
-        $stmtUserTrack->execute([$userId, $trackId, $rating, $isFavorite]);
-
-        // 4. Atualizar estatísticas da música (opcional, mas recomendado)
-        $pdo->prepare("UPDATE tracks SET 
-            average_rating = (SELECT AVG(rating) FROM user_tracks WHERE track_id = ?),
-            favorite_count = (SELECT COUNT(*) FROM user_tracks WHERE track_id = ? AND is_favorite = 1)
-            WHERE id = ?")->execute([$trackId, $trackId, $trackId]);
 
         $pdo->commit();
-        $message = "Música salva com sucesso!";
+
+        // Se for uma requisição AJAX, retorna JSON e encerra
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            echo json_encode($response);
+            exit;
+        }
+
     } catch (Exception $e) {
         $pdo->rollBack();
         $error = "Erro ao salvar: " . $e->getMessage();
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+            exit;
+        }
     }
 }
 

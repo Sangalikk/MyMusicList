@@ -14,22 +14,36 @@
                 <span class="track-artist">{{ track.artist_name }}</span>
                 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
-                    <div class="rating-badge">
+                    <a href="#" class="rating-badge rating-badge-clickable"
+                       data-internal-track-id="{{ track.internal_track_id }}"
+                       data-rating="{{ track.rating }}"
+                       data-is-favorite="{{ track.is_favorite }}">
                         ★ {{ track.rating ? track.rating ~ '/10' : 'S/N' }}
+                    </a>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">
+                        🎧 {{ track.listen_count }} ouvintes
                     </div>
-                    {% if track.is_favorite %}
+                    <!-- {% if track.is_favorite %}
                         <span title="Favorito" style="color: var(--spotify-green); font-size: 1.2rem; cursor: default;">❤️</span>
-                    {% endif %}
+                    {% endif %} -->
                 </div>
 
-                <!-- Widget da Deezer para ouvir direto da sua lista -->
-                <iframe title="deezer-widget" 
-                        src="https://widget.deezer.com/widget/dark/track/{{ track.external_id }}" 
-                        width="100%" height="80" 
-                        frameborder="0" 
-                        allowtransparency="true" 
-                        allow="encrypted-media; clipboard-write" 
-                        style="margin-top: 15px; border-radius: 8px;"></iframe>
+                <div class="preview-wrapper" style="min-height: 90px; display: flex; align-items: center; justify-content: center;">
+                    <button type="button" class="btn-listen-trigger btn-save" 
+                            style="background: #333; color: white; width: 100%;" 
+                            data-track-id="{{ track.spotify_id }}">▶ Ouvir Prévia</button>
+                </div>
+
+                <form class="search-actions" style="display:none;">
+                    <input type="hidden" name="spotify_id" value="{{ track.spotify_id }}">
+                    <input type="hidden" name="title" value="{{ track.title }}">
+                    <input type="hidden" name="artist_name" value="{{ track.artist_name }}">
+                    <input type="hidden" name="artist_id" value="{{ track.artist_id }}">
+                    <input type="hidden" name="album_name" value="{{ track.album_name }}">
+                    <input type="hidden" name="image_url" value="{{ track.image_url }}">
+                    <input type="hidden" name="duration" value="{{ track.duration }}">
+                    <input type="hidden" name="artist_image" value="{{ track.artist_image }}">
+                </form>
             </div>
         {% else %}
             <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">

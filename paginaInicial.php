@@ -11,6 +11,7 @@ try {
         SELECT t.*, a.name AS artist_name 
         FROM tracks t
         LEFT JOIN artists a ON t.artist_id = a.id
+        WHERE t.average_rating > 0
         ORDER BY t.average_rating DESC
         LIMIT 12
     ");
