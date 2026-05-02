@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Music List - Início</title>
-    <link rel="stylesheet" href="{{ base_url }}css/_base.css">
+    <title>My Music List</title>
+    {# O sufixo ?v= garante que o navegador recarregue o CSS sempre que houver mudança #}
+    <link rel="stylesheet" href="{{ base_url }}css/_base.css?v={{ "now"|date("U") }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -15,9 +16,17 @@
         <div class="spinner"></div>
     </div>
 
+    <!-- Barra superior fixa apenas para Mobile -->
+    <div class="mobile-top-bar">
+        <span class="mobile-brand">My Music List</span>
+        <button id="mobile-menu-toggle" class="mobile-menu-btn">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </div>
+
     <div class="app-container {% block container_class %}{% endblock %}">
         {% block sidebar %}
-            <aside class="sidebar">
+            <aside class="sidebar" id="sidebar">
                 <h2>My Music List</h2>
                 <nav>
                     <ul class="nav-links">

@@ -1,7 +1,7 @@
 // Declaramos as variáveis no topo para que todas as funções do arquivo possam acessá-las
 let editModal, modalCloseBtn, editTrackForm, modalTrackIdInput, modalRatingSelect, modalFavoriteCheckbox, modalDeleteBtn;
 let modalMainSection, modalConfirmSection, btnConfirmDeleteFinal, btnCancelDelete;
-let profileModal, profileForm, profileImageInput, profilePreview, globalLoader;
+let profileModal, profileForm, profileImageInput, profilePreview, globalLoader, sidebar, mobileToggle;
 
 document.addEventListener('DOMContentLoaded', () => {
     // Inicializamos os elementos quando o DOM estiver pronto
@@ -17,6 +17,23 @@ document.addEventListener('DOMContentLoaded', () => {
     modalConfirmSection = document.getElementById('modal-confirm-section');
     btnConfirmDeleteFinal = document.getElementById('btn-confirm-delete-final');
     btnCancelDelete = document.getElementById('btn-cancel-delete');
+
+    // Elementos do Menu Mobile
+    sidebar = document.getElementById('sidebar');
+    mobileToggle = document.getElementById('mobile-menu-toggle');
+
+    if (mobileToggle && sidebar) {
+        mobileToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            sidebar.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (sidebar.classList.contains('active') && !sidebar.contains(e.target) && e.target !== mobileToggle) {
+                sidebar.classList.remove('active');
+            }
+        });
+    }
 
     // Perfil
     profileModal = document.getElementById('profile-modal');
