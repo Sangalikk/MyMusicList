@@ -31,11 +31,16 @@ try {
     $stmtArtists = $pdo->query("SELECT * FROM artists LIMIT 6");
     $featuredArtists = $stmtArtists->fetchAll(PDO::FETCH_ASSOC);
 
+    // Captura a mensagem de sucesso da sessão e a remove logo em seguida (Flash Message)
+    $registerSuccess = $_SESSION['register_success'] ?? null;
+    unset($_SESSION['register_success']);
+
     // Renderizar o template passando as variáveis
     echo $twig->render('paginaInicial.html', [
         'top_rated' => $topRatedTracks,
         'popular' => $popularTracks,
-        'artists' => $featuredArtists
+        'artists' => $featuredArtists,
+        'register_success' => $registerSuccess
     ]);
 
 } catch (PDOException $e) {

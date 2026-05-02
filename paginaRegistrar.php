@@ -35,7 +35,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)");
                 $stmt->execute([$username, $email, $hash]);
                 
-                $success = "Conta criada com sucesso! Você já pode entrar.";
+                // Loga o usuário automaticamente e define a mensagem para o popup
+                $_SESSION['user_id'] = $pdo->lastInsertId();
+                $_SESSION['username'] = $username;
+                $_SESSION['register_success'] = "Conta criada com sucesso! Bem-vindo ao My Music List.";
+
+                header('Location: paginaInicial.php');
+                exit;
             }
         } catch (PDOException $e) {
             $error = "Erro ao criar conta. Tente novamente.";

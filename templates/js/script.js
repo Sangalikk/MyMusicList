@@ -1,9 +1,11 @@
 // Declaramos as variáveis no topo para que todas as funções do arquivo possam acessá-las
 let editModal, modalCloseBtn, editTrackForm, modalTrackIdInput, modalRatingSelect, modalFavoriteCheckbox, modalDeleteBtn;
 let modalMainSection, modalConfirmSection, btnConfirmDeleteFinal, btnCancelDelete;
+let profileModal, profileForm, profileImageInput, profilePreview, globalLoader;
 
 document.addEventListener('DOMContentLoaded', () => {
     // Inicializamos os elementos quando o DOM estiver pronto
+    globalLoader = document.getElementById('global-loader');
     editModal = document.getElementById('track-edit-modal');
     modalCloseBtn = editModal.querySelector('.modal-close-btn');
     editTrackForm = document.getElementById('edit-track-form');
@@ -15,6 +17,52 @@ document.addEventListener('DOMContentLoaded', () => {
     modalConfirmSection = document.getElementById('modal-confirm-section');
     btnConfirmDeleteFinal = document.getElementById('btn-confirm-delete-final');
     btnCancelDelete = document.getElementById('btn-cancel-delete');
+
+    // Perfil
+    profileModal = document.getElementById('profile-modal');
+    profileForm = document.getElementById('profile-edit-form');
+    profileImageInput = document.getElementById('profile_image');
+    profilePreview = document.getElementById('profile-preview');
+    const editProfileBtn = document.getElementById('edit-profile-btn');
+
+    if (editProfileBtn) {
+        editProfileBtn.addEventListener('click', () => profileModal.classList.add('active'));
+    }
+
+    document.getElementById('profile-modal-close')?.addEventListener('click', () => profileModal.classList.remove('active'));
+
+    // Preview da imagem
+    profileImageInput?.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => profilePreview.src = e.target.result;
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Envio do Perfil via AJAX
+    profileForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(profileForm);
+        const submitBtn = profileForm.querySelector('.btn-save');
+        showLoader();
+        submitBtn.disabled = true;
+
+        try {
+            const response = await fetch('updateProfile.php', { method: 'POST', body: formData });
+            const result = await response.json();
+            showNotification(result.message, result.status === 'success');
+            if (result.status === 'success') {
+                setTimeout(() => location.reload(), 1000);
+            }
+        } catch (err) {
+            showNotification('Erro ao atualizar perfil', false);
+        } finally { 
+            submitBtn.disabled = false; 
+            hideLoader();
+        }
+    });
 
     // Abre o modal quando o badge de nota é clicado
     document.addEventListener('click', (e) => {
@@ -48,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const originalText = submitBtn.textContent;
         submitBtn.textContent = 'Salvando...';
         submitBtn.disabled = true;
+        showLoader();
 
         try {
             const response = await fetch('updateUserTrack.php', {
@@ -65,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             showNotification('Erro ao salvar alterações.', false);
         } finally {
+            hideLoader();
             submitBtn.textContent = originalText;
             submitBtn.disabled = false;
         }
@@ -121,6 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         btnConfirmDeleteFinal.textContent = 'Removendo...';
         btnConfirmDeleteFinal.disabled = true;
+        showLoader();
 
         try {
             const response = await fetch('updateUserTrack.php', {
@@ -138,6 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             showNotification('Erro ao remover música.', false);
         } finally {
+            hideLoader();
             btnConfirmDeleteFinal.textContent = 'Sim, Remover';
             btnConfirmDeleteFinal.disabled = false;
         }
@@ -156,6 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const originalText = submitBtn.textContent;
             submitBtn.textContent = '...';
             submitBtn.disabled = true;
+            showLoader();
 
             try {
                 const response = await fetch('paginaBuscar.php', {
@@ -171,12 +224,32 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 showNotification('Erro de conexão com o servidor', false);
             } finally {
+                hideLoader();
                 submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
             }
         }
     });
+
+    // Lógica para mostrar loader na busca principal (que recarrega a página)
+    const searchForm = document.querySelector('.search-form-centered');
+    if (searchForm) {
+        searchForm.addEventListener('submit', () => {
+            const query = searchForm.querySelector('input[name="q"]').value;
+            if (query.trim() !== '') {
+                showLoader();
+            }
+        });
+    }
 });
+
+function showLoader() {
+    globalLoader.classList.add('active');
+}
+
+function hideLoader() {
+    globalLoader.classList.remove('active');
+}
 
 function showNotification(text, isSuccess) {
     const container = document.getElementById('notification-container');

@@ -9,6 +9,8 @@ CREATE TABLE users (
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
+    bio TEXT,
+    profile_image_url VARCHAR(500),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
@@ -38,7 +40,7 @@ CREATE TABLE tracks (
     provider VARCHAR(20) DEFAULT 'deezer',
     
     -- Estatísticas agregadas (facilita a leitura em massa)
-    average_rating DECIMAL(3, 2) DEFAULT 0.00, -- Média das notas
+    average_rating DECIMAL(3, 1) DEFAULT 0.0, -- Média das notas
     favorite_count INTEGER DEFAULT 0,         -- Total de favoritos
     listen_count INTEGER DEFAULT 0,           -- Total de pessoas que ouviram
 

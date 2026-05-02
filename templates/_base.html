@@ -8,9 +8,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 <body>
+    <div id="global-loader" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
     <div class="app-container {% block container_class %}{% endblock %}">
         {% block sidebar %}
             <aside class="sidebar">
@@ -21,6 +25,20 @@
                         <li><a href="{{ base_url }}paginaBuscar.php">Buscar</a></li>
                         <li><a href="{{ base_url }}paginaMinhaLista.php">Minha Lista</a></li>
                         <li><a href="{{ base_url }}paginaFavoritos.php">Favoritos</a></li>
+                        {% if session.user_id %}
+                            <li style="margin-top: 24px;">
+                                <a href="{{ base_url }}paginaPerfil.php" class="profile-trigger">
+                                    <div class="profile-pic-container">
+                                        {% if session.profile_image %}
+                                            <img src="{{ base_url ~ session.profile_image }}" alt="Perfil" class="profile-pic-small">
+                                        {% else %}
+                                            <div class="profile-pic-placeholder"><i class="fa-solid fa-user"></i></div>
+                                        {% endif %}
+                                    </div>
+                                    <span class="profile-username">{{ session.username }}</span>
+                                </a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </nav>
 
@@ -38,8 +56,11 @@
             </aside>
         {% endblock %}
 
+        <div class="main-wrapper">
+
         {% block content %}
         {% endblock %}
+        </div>
     </div>
 
     <div id="notification-container" class="notification-container"></div>
@@ -58,17 +79,20 @@
 
                     <div class="form-group">
                         <label for="modal-rating">Sua Nota:</label>
-                        <select name="rating" id="modal-rating" class="rating-input">
-                            <option value="">Sem Nota</option>
-                            {% for i in 10..1 %}
-                                <option value="{{ i }}">{{ i }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="rating-select-wrapper">
+                            <i class="fa-solid fa-star rating-star-icon"></i>
+                            <select name="rating" id="modal-rating" class="rating-input">
+                                <option value="">Sem Nota</option>
+                                {% for i in 10..1 %}
+                                    <option value="{{ i }}">{{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
 
                     <div class="form-group" style="margin-top: 20px;">
                         <label for="modal-favorite" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                            <input type="checkbox" name="favorite" id="modal-favorite" value="1" style="width: auto; margin: 0;"> Marcar como Favorita ❤️
+                            <input type="checkbox" {% if track.favorite %}checked{% endif %} name="favorite" id="modal-favorite" value="1" style="width: auto; margin: 0;"> Marcar como Favorita ❤️
                         </label>
                     </div>
 
@@ -91,6 +115,40 @@
         </div>
     </div>
 
-    <script src="{{ base_url }}templates/js/notifications.js"></script>
+    <!-- Modal de Perfil -->
+    <div id="profile-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn" id="profile-modal-close">&times;</button>
+            <h2>Seu Perfil</h2>
+            <form id="profile-edit-form" enctype="multipart/form-data">
+                <div class="form-group" style="text-align: center;">
+                    <div class="profile-pic-upload">
+                        <img src="{{ session.profile_image ? base_url ~ session.profile_image : base_url ~ 'img/default-user.png' }}" id="profile-preview" class="profile-pic-large">
+                        <label for="profile_image" class="upload-label">Alterar Foto</label>
+                        <input type="file" name="profile_image" id="profile_image" hidden accept="image/*">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="bio">Sobre você:</label>
+                    <textarea name="bio" id="bio" class="rating-input" style="height: 100px; resize: none;">{{ session.bio }}</textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn-save">Salvar Perfil</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ base_url }}templates/js/script.js"></script>
+
+    {% if register_success %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            showNotification("{{ register_success }}", true);
+        });
+    </script>
+    {% endif %}
 </body>
 </html>

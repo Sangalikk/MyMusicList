@@ -1,0 +1,70 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<main class="main-content">
+    <div class="profile-header">
+        <div class="profile-info-main">
+            <div class="profile-pic-container-large">
+                {% if profile_user.profile_image_url %}
+                    <img src="{{ base_url ~ profile_user.profile_image_url }}" alt="{{ profile_user.username }}" class="profile-pic-large">
+                {% else %}
+                    <div class="profile-pic-large profile-pic-placeholder" style="font-size: 4rem;">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="profile-text">
+                <span class="profile-label">Perfil</span>
+                <h1 class="profile-name-display">{{ profile_user.username }}</h1>
+                <p class="profile-bio-display">{{ profile_user.bio|default('Nenhuma biografia disponível.') }}</p>
+                
+                {% if is_own_profile %}
+                    <button class="btn-save" id="edit-profile-btn" style="margin-top: 15px; width: auto; padding: 10px 25px;">Editar Perfil</button>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="profile-stats">
+            <div class="stat-item">
+                <span class="stat-value">{{ stats.total_tracks|default(0) }}</span>
+                <span class="stat-label">Músicas</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ stats.total_favorites|default(0) }}</span>
+                <span class="stat-label">Favoritos</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ stats.avg_rating|number_format(1) }}</span>
+                <span class="stat-label">Média</span>
+            </div>
+        </div>
+    </div>
+
+    <section style="margin-top: 40px;">
+        <h2>Músicas na Lista</h2>
+        <div class="music-grid">
+            {% for track in user_tracks %}
+                <div class="track-card" data-internal-track-id="{{ track.track_id }}">
+                    <img src="{{ track.image_url|default(base_url ~ 'img/default-album.png') }}" alt="{{ track.title }}">
+                    <span class="track-title">{{ track.title }}</span>
+                    <span class="track-artist">{{ track.artist_name }}</span>
+                    
+                    {% if is_own_profile %}
+                        <a href="#" class="rating-badge rating-badge-clickable" 
+                           data-internal-track-id="{{ track.track_id }}"
+                           data-rating="{{ track.rating }}"
+                           data-is-favorite="{{ track.is_favorite ? '1' : '0' }}">
+                            ★ {{ track.rating }}
+                        </a>
+                    {% else %}
+                        <div class="rating-badge">★ {{ track.rating }}</div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <p style="color: var(--text-muted);">Nenhuma música adicionada ainda.</p>
+            {% endfor %}
+        </div>
+    </section>
+</main>
+{% endblock %}

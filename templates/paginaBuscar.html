@@ -4,9 +4,16 @@
 <div class="search-container">
     <div class="search-bar-section">
         <form action="paginaBuscar.php" method="GET" class="search-form-centered">
-            <div class="search-input-wrapper">
-                <i class="fa-solid fa-magnifying-glass search-icon-placeholder"></i>
-                <input type="text" name="q" value="{{ query }}" placeholder="O que você quer ouvir?" class="spotify-search-input" autocomplete="off">
+            <div style="display: flex; gap: 10px; width: 100%; max-width: 650px;">
+                <div class="search-input-wrapper" style="flex: 1;">
+                    <i class="fa-solid fa-magnifying-glass search-icon-placeholder"></i>
+                    <input type="text" name="q" value="{{ query }}" placeholder="O que você quer ouvir?" class="spotify-search-input" autocomplete="off">
+                </div>
+                <select name="type" class="rating-input" style="width: auto; padding: 0 20px; border-radius: 500px; cursor: pointer;">
+                    <option value="music" {% if type == 'music' %}selected{% endif %}>Músicas</option>
+                    <option value="perfil" {% if type == 'perfil' %}selected{% endif %}>Perfis</option>
+                </select>
+                <button type="submit" style="display: none;"></button>
             </div>
         </form>
     </div>
@@ -14,6 +21,7 @@
     {% if message %}<div style="color: var(--spotify-green); margin-bottom: 20px;">{{ message }}</div>{% endif %}
     {% if error %}<div style="color: #ff4444; margin-bottom: 20px;">{{ error }}</div>{% endif %}
 
+    {% if type == 'music' %}
     <div class="music-grid">
         {% for track in tracks %}
         <div class="track-card">
@@ -41,15 +49,19 @@
                 <input type="hidden" name="artist_image" value="{{ track.artist_image }}">
 
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <select name="rating" class="rating-input" title="Sua nota">
-                        <option value="">Nota</option>
-                        {% for i in 10..1 %}
-                            <option value="{{ i }}">{{ i }}</option>
-                        {% endfor %}
-                    </select>
+                    <div class="rating-select-wrapper">
+                        <i class="fa-solid fa-star rating-star-icon"></i>
+                        <select name="rating" class="rating-input" title="Sua nota">
+                            <option value="">Nota</option>
+                            {% for i in 10..1 %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                     
-                    <label style="cursor: pointer; color: var(--text-muted);">
-                        <input type="checkbox" name="favorite" value="1"> ❤️
+                    <label class="favorite-toggle" title="Marcar como favorito">
+                        <input type="checkbox" name="favorite" value="1">
+                        <i class="fa-solid fa-heart"></i>
                     </label>
                 </div>
 
@@ -58,8 +70,25 @@
         </div>
         {% endfor %}
     </div>
+    {% else %}
+    <div class="music-grid">
+        {% for profile in profiles %}
+        <a href="{{ base_url }}paginaPerfil.php?id={{ profile.id }}" class="track-card" style="text-align: center; text-decoration: none;">
+            {% if profile.profile_image_url %}
+                <img src="{{ base_url ~ profile.profile_image_url }}" alt="{{ profile.username }}" style="border-radius: 50%;">
+            {% else %}
+                <div class="profile-pic-large profile-pic-placeholder" style="width: 100%; aspect-ratio: 1/1; border-radius: 50%; font-size: 3rem; margin-bottom: 16px;">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+            {% endif %}
+            <span class="track-title" style="font-size: 1.1rem;">{{ profile.username }}</span>
+            <span class="track-artist">Perfil</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
 
-    {% if query and not tracks %}
+    {% if query and not tracks and not profiles %}
         <p>Nenhum resultado encontrado para "{{ query }}".</p>
     {% endif %}
 </div>

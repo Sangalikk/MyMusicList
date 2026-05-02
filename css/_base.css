@@ -85,6 +85,100 @@ body {
     width: 100%;
 }
 
+.main-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.profile-trigger {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg-light-grey);
+    padding: 4px 12px 4px 4px;
+    border-radius: 500px;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none; /* Remove underline do link */
+    user-select: none;
+}
+
+.profile-trigger:hover { background: var(--bg-hover); }
+
+.profile-pic-small, .profile-pic-placeholder {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #333;
+    color: var(--text-muted);
+    overflow: hidden;
+    flex-shrink: 0; /* Impede que o círculo amasse */
+}
+
+.profile-pic-placeholder i {
+    font-size: 0.9rem;
+}
+
+.profile-pic-large {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 3px solid var(--spotify-green);
+}
+
+/* Estilos da Página de Perfil */
+.profile-header {
+    display: flex;
+    align-items: flex-end;
+    gap: 30px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    flex-wrap: wrap;
+}
+
+.profile-info-main {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex: 1;
+    min-width: 300px;
+}
+
+.profile-label { text-transform: uppercase; font-size: 0.75rem; font-weight: 700; }
+.profile-name-display { font-size: 4rem; margin: 0; line-height: 1; }
+.profile-bio-display { color: var(--text-muted); margin-top: 10px; max-width: 600px; }
+
+.profile-stats {
+    display: flex;
+    gap: 40px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--spotify-green);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.upload-label { color: var(--spotify-green); cursor: pointer; font-size: 0.9rem; font-weight: bold; }
+
 /* Grade de Músicas */
 .music-grid {
     display: grid;
@@ -123,6 +217,14 @@ body {
     text-overflow: ellipsis;
 }
 
+.music-grid a.track-card .track-title {
+    color: var(--text-main); /* Garante que o nome do perfil seja sempre branco */
+    text-decoration: none; /* Remove qualquer sublinhado padrão de link */
+}
+.music-grid a.track-card:hover .track-title {
+    color: var(--text-main); /* Garante que o nome do perfil não mude de cor no hover */
+}
+
 .track-artist {
     color: var(--text-muted);
     font-size: 0.9rem;
@@ -146,6 +248,29 @@ body {
     transform: scale(1.15); /* Aumenta levemente ao passar o mouse */
 }
 
+/* Estilo para o Toggle de Favorito (Coração) */
+.favorite-toggle {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    transition: transform 0.2s;
+}
+
+.favorite-toggle input {
+    display: none; /* Esconde o checkbox real */
+}
+
+.favorite-toggle i {
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.2); /* Cor discreta quando não favoritado */
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.favorite-toggle:hover i { color: rgba(255, 255, 255, 0.5); transform: scale(1.2); }
+.favorite-toggle input:checked + i { color: #ff0000; transform: scale(1.1); filter: drop-shadow(0 0 5px rgba(255,0,0,0.3)); }
+
 /* Estilos para a busca e ações */
 .search-actions {
     margin-top: 15px;
@@ -161,6 +286,26 @@ body {
     padding: 5px;
     border-radius: 4px;
     width: 100%;
+}
+
+.rating-select-wrapper {
+    position: relative;
+    flex: 1;
+    width: 100%;
+}
+
+.rating-star-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--rating-gold);
+    font-size: 0.85rem;
+    pointer-events: none; /* Permite clicar no select através do ícone */
+}
+
+.rating-select-wrapper .rating-input {
+    padding-left: 30px !important; /* Abre espaço para a estrela à esquerda */
 }
 
 .btn-save {
@@ -446,4 +591,34 @@ body {
         transform: translateY(0);
         opacity: 1;
     }
+}
+
+/* Overlay de Carregamento Global */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: none; /* Escondido por padrão */
+    justify-content: center;
+    align-items: center;
+    z-index: 20000; /* Acima de tudo */
+}
+
+.loading-overlay.active { display: flex; }
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--bg-hover);
+    border-top: 5px solid var(--spotify-green);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

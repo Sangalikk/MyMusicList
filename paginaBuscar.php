@@ -99,48 +99,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
 // --- LÓGICA DE BUSCA (GET) ---
 $query = $_GET['q'] ?? '';
+$type = $_GET['type'] ?? 'music';
 $tracks = [];
+$profiles = [];
 
 if ($query) {
     try {
-        $ch = curl_init();
-        $params = [
-            'q' => $query,
-            'limit' => 21
-        ];
-        
-        // A API da Deezer não exige Token para buscas públicas
-        curl_setopt($ch, CURLOPT_URL, 'https://api.deezer.com/search?' . http_build_query($params));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        $result = curl_exec($ch);
-        
-        if (curl_errno($ch)) {
-            throw new Exception(curl_error($ch));
-        }
-
-        $data = json_decode($result, true);
-        
-        if (isset($data['error'])) {
-            throw new Exception($data['error']['message']);
-        }
-
-        if (isset($data['data'])) {
-            foreach ($data['data'] as $item) {
-                $tracks[] = [
-                    'spotify_id' => $item['id'], // Mantendo o nome da chave para compatibilidade com o POST
-                    'title' => $item['title'],
-                    'artist_name' => $item['artist']['name'],
-                    'artist_id' => $item['artist']['id'],
-                    'artist_image' => $item['artist']['picture_medium'],
-                    'album_name' => $item['album']['title'],
-                    'image_url' => $item['album']['cover_medium'] ?? '',
-                    'duration' => $item['duration'], // Deezer já retorna em segundos
-                    'preview_url' => $item['preview']
-                ];
+        if ($type === 'perfil') {
+            $stmt = $pdo->prepare("SELECT id, username, profile_image_url FROM users WHERE username LIKE ? LIMIT 21");
+            $stmt->execute(["%$query%"]);
+            $profiles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            $ch = curl_init();
+            $params = [
+                'q' => $query,
+                'limit' => 21
+            ];
+            
+            // A API da Deezer não exige Token para buscas públicas
+            curl_setopt($ch, CURLOPT_URL, 'https://api.deezer.com/search?' . http_build_query($params));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            $result = curl_exec($ch);
+            
+            if (curl_errno($ch)) {
+                throw new Exception(curl_error($ch));
             }
+
+            $data = json_decode($result, true);
+            
+            if (isset($data['error'])) {
+                throw new Exception($data['error']['message']);
+            }
+
+            if (isset($data['data'])) {
+                foreach ($data['data'] as $item) {
+                    $tracks[] = [
+                        'spotify_id' => $item['id'], // Mantendo o nome da chave para compatibilidade com o POST
+                        'title' => $item['title'],
+                        'artist_name' => $item['artist']['name'],
+                        'artist_id' => $item['artist']['id'],
+                        'artist_image' => $item['artist']['picture_medium'],
+                        'album_name' => $item['album']['title'],
+                        'image_url' => $item['album']['cover_medium'] ?? '',
+                        'duration' => $item['duration'], // Deezer já retorna em segundos
+                        'preview_url' => $item['preview']
+                    ];
+                }
+            }
+            curl_close($ch);
         }
-        curl_close($ch);
     } catch (Exception $e) {
         $error = "Erro na API da Deezer: " . $e->getMessage();
     }
@@ -148,7 +156,9 @@ if ($query) {
 
 echo $twig->render('paginaBuscar.html', [
     'query' => $query,
+    'type' => $type,
     'tracks' => $tracks,
+    'profiles' => $profiles,
     'message' => $message ?? null,
     'error' => $error ?? null
 ]);

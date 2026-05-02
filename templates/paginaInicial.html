@@ -12,7 +12,7 @@
                             <img src="{{ track.image_url|default('https://placehold.co/300x300/181818/ffffff?text=Sem+Capa') }}" alt="Capa de {{ track.title }}">
                             <span class="track-title">{{ track.title }}</span>
                             <span class="track-artist">{{ track.artist_name }}</span>
-                            <div class="rating-badge">★ {{ track.average_rating }}</div>
+                            <div class="rating-badge">★ {{ track.average_rating|number_format(1, '.', '') }}</div>
                         </div>
                     {% else %}
                         <p>Nenhuma música encontrada.</p>
